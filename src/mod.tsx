@@ -1,8 +1,5 @@
 import './arwes-ui'
 
-// unused
-export const worldReady = () => { }
-
 console.log('Arwes UI mod loaded')
 
 // patch playSound

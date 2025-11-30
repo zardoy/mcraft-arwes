@@ -17,14 +17,8 @@ const buildOptions = {
     bundle: true,
     sourcemap: false,
     logLevel: "info",
-    format: 'cjs',
+    format: 'esm',
     target: "es2020",
-    banner: {
-        js: `const module = {};const require = (path) => {\nreturn ({ ${Object.entries(importsMap).map(([key, value]) => `"${key}": ${value}`).join(', ')} })[path];\n};`
-    },
-    footer: {
-        js: `export { worldReady };`
-    },
     external: ["react", "react-dom", "three"],
     loader: {
         '.png': 'dataurl',
@@ -32,6 +26,25 @@ const buildOptions = {
         '.webp': 'dataurl',
         '.svg': 'dataurl',
     },
+    plugins: [
+        {
+            name: 'inject-dependencies',
+            setup(build) {
+                build.onResolve({ filter: new RegExp("^(" + Object.keys(importsMap).join('|') + ")$") }, (args) => {
+                    return {
+                        namespace: 'inject-dependencies',
+                        path: importsMap[args.path],
+                    }
+                });
+                build.onLoad({ filter: /.*/, namespace: 'inject-dependencies' }, async (args) => {
+                    return {
+                        contents: `module.exports = ${args.path};`,
+                        loader: 'js',
+                    }
+                });
+            }
+        }
+    ]
 };
 
 if (isWatch) {
