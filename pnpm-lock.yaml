@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@arwes/frames':
+        specifier: 1.0.0-next.25020502
+        version: 1.0.0-next.25020502(motion@10.18.0)
       '@arwes/react':
         specifier: 1.0.0-next.25020502
         version: 1.0.0-next.25020502(motion@10.18.0)(react@19.2.0)
