@@ -12,6 +12,7 @@ declare global {
                 useSnapshot: <T>(snapshot: T) => T
             }
         }
+        loadSound: (sound: string) => void
         playSound: (sound: string) => void
         miscUiState: {
             hadConnected: boolean

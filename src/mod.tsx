@@ -2,6 +2,8 @@ import './arwes-ui'
 
 console.log('Arwes UI mod loaded')
 
+window.loadSound('https://next.arwes.dev/assets/sounds/click.webm')
+
 // patch playSound
 const originalPlaySound = window.playSound
 window.playSound = (...args: any[]) => {
