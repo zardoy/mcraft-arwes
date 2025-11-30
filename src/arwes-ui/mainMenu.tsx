@@ -446,12 +446,12 @@ interface ArwesMainMenuProps {
   optionsAction: () => void
   onVersionStatusClick?: () => void
   onVersionTextClick?: () => void
-  versionTitle?: string
+  versionText?: string
   singleplayerAvailable?: boolean
 }
 
 export const ArwesMainMenu = (props: ArwesMainMenuProps) => {
-  const { connectToServerAction, singleplayerAction, optionsAction, onVersionStatusClick, onVersionTextClick, versionTitle, singleplayerAvailable } = props
+  const { connectToServerAction, singleplayerAction, optionsAction, onVersionStatusClick, onVersionTextClick, versionText, singleplayerAvailable } = props
   const [active, setActive] = useState(true)
 
   useEffect(() => {
@@ -513,7 +513,7 @@ export const ArwesMainMenu = (props: ArwesMainMenuProps) => {
             </Animator>
           </div>
         }
-        footer={<span>| {versionTitle || 'v0.0.100'}</span>}
+        footer={<span onClick={onVersionTextClick}>| {versionText || 'v0.0.100'}</span>}
       />
     </div>
   )
