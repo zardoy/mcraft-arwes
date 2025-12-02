@@ -1,0 +1,12 @@
+{
+    "packages": [
+        {
+            "name": "zardoy.arwes-ui",
+            "version": "0.0.0",
+            "scriptMainUnstable": "dist/mod.js",
+            "threeJsBackend": "dist/three.js",
+            "description": "Arwes UI mod for Mcraft (futuristic UI)",
+            "author": "zardoy"
+        }
+    ]
+}
