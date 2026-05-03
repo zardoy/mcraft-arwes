@@ -40,6 +40,8 @@
     <iframe id="mcraftFrame" allowfullscreen allow="microphone *; camera *; display-capture *; autoplay *; clipboard-write *; clipboard-read *; xr-spatial-tracking *;"></iframe>
 
     <script>
+        const BASE_DOMAIN = 'https://mwc-next-renderer.vercel.app';
+
         // Build iframe URL with query parameters from current location
         (function() {
             // Set og:url to current page URL
@@ -49,7 +51,6 @@
             }
 
             const iframe = document.getElementById('mcraftFrame');
-            const BASE_DOMAIN = 'https://mwc-next-renderer.vercel.app';
             const baseParams = new URLSearchParams('parentFrameMods=1&setting=rendererFuturisticReveal:true');
 
             // Get query parameters from current location
@@ -70,7 +71,7 @@
         // Listen for mod requests from iframe
         window.addEventListener('message', async function(event) {
             // Verify origin for security
-            if (!event.origin.includes('mcraft.fun')) {
+            if (!event.origin.includes(BASE_DOMAIN)) {
                 return;
             }
 
