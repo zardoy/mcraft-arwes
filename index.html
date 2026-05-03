@@ -49,8 +49,8 @@
             }
 
             const iframe = document.getElementById('mcraftFrame');
-            const baseUrl = 'https://mwc-next-renderer.vercel.app?setting=rendererFuturisticReveal:true';
-            const baseParams = new URLSearchParams('parentFrameMods=1');
+            const BASE_DOMAIN = 'https://mwc-next-renderer.vercel.app';
+            const baseParams = new URLSearchParams('parentFrameMods=1&setting=rendererFuturisticReveal:true');
 
             // Get query parameters from current location
             const currentParams = new URLSearchParams(window.location.search);
@@ -61,7 +61,7 @@
             }
 
             // Set iframe src with merged parameters
-            iframe.src = `${baseUrl}?${baseParams.toString()}`;
+            iframe.src = `${BASE_DOMAIN}?${baseParams.toString()}`;
         })();
 
         const MODS_REQUEST_MESSAGE = 'mwc:modsRequest';
