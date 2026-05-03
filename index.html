@@ -51,7 +51,8 @@
             }
 
             const iframe = document.getElementById('mcraftFrame');
-            const baseParams = new URLSearchParams('parentFrameMods=1&setting=rendererFuturisticReveal:true');
+            // TODO add back futuristic reveal : &setting=rendererFuturisticReveal:true after perf fixed
+            const baseParams = new URLSearchParams('parentFrameMods=1');
 
             // Get query parameters from current location
             const currentParams = new URLSearchParams(window.location.search);
