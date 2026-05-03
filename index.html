@@ -49,7 +49,7 @@
             }
 
             const iframe = document.getElementById('mcraftFrame');
-            const baseUrl = 'https://v2.mcraft.fun';
+            const baseUrl = 'https://mwc-next-renderer.vercel.app?setting=rendererFuturisticReveal:true';
             const baseParams = new URLSearchParams('parentFrameMods=1');
 
             // Get query parameters from current location
@@ -79,7 +79,7 @@
                 version: '0.1.0',
                 enabled: true,
                 scriptMainUnstable: await fetch('dist/mod.js').then(res => res.text()).then(text => text.replace('//# sourceURL=dist/mod.js', '')),
-                threeJsBackend: await fetch('dist/three.js').then(res => res.text()).then(text => text.replace('//# sourceURL=dist/three.js', '')),
+                // threeJsBackend: await fetch('dist/three.js').then(res => res.text()).then(text => text.replace('//# sourceURL=dist/three.js', '')),
                 description: 'Arwes UI mod for Mcraft (futuristic UI)',
                 author: 'zardoy',
             };
