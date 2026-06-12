@@ -249,7 +249,6 @@ export const ButtonWithFrame: React.FC<ButtonWithFrameProps> = ({
   colorPalette = 'default',
   animationDelay,
   onMouseEnter,
-  onClick,
   children
 }) => {
   const frameRef = useRef<SVGSVGElement>(null!)
@@ -279,7 +278,6 @@ export const ButtonWithFrame: React.FC<ButtonWithFrameProps> = ({
       data-palette={colorPalette}
       animated={animationProp}
       onMouseEnter={onMouseEnter}
-      onClick={onClick}
     >
       {/* Frame mounted with delay, sits outside the button content */}
       {showFrame && (

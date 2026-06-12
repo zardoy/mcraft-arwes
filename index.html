@@ -41,6 +41,7 @@
 
     <script>
         const BASE_DOMAIN = 'https://mwc-next-renderer.vercel.app';
+        // const BASE_DOMAIN = 'http://localhost:3001';
 
         // Build iframe URL with query parameters from current location
         (function() {
@@ -52,7 +53,7 @@
 
             const iframe = document.getElementById('mcraftFrame');
             // TODO add back futuristic reveal : &setting=rendererFuturisticReveal:true after perf fixed
-            const baseParams = new URLSearchParams('parentFrameMods=1&setting=rendererFuturisticReveal:true');
+            const baseParams = new URLSearchParams('parentFrameMods=1&setting=rendererFuturisticReveal:true&setting=renderDebug:%22advanced%22&setting=menuBackgroundFuturisticScene:%22cyber%22');
 
             // Get query parameters from current location
             const currentParams = new URLSearchParams(window.location.search);
