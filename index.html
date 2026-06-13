@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover'>
     <title>Mcraft Arwes Version</title>
 
     <!-- Open Graph / Facebook -->
@@ -100,6 +100,26 @@
                 }, '*');
             }
         });
+
+        const detectAndResetZoom = () => {
+            const { visualViewport } = window
+            if (!visualViewport) return
+
+            if (visualViewport.scale !== 1) {
+                // Reset zoom by updating viewport meta tag
+                const viewport = document.querySelector('meta[name=viewport]')
+                if (viewport) {
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
+                    // Force re-layout
+                    setTimeout(() => {
+                        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
+                    }, 300)
+                }
+            }
+        }
+
+        detectAndResetZoom()
+        window.addEventListener('pointerdown', detectAndResetZoom)
     </script>
 </body>
 </html>
