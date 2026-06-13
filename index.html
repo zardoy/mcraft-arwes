@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover'>
+    <title>Mcraft Arwes Version</title>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Mcraft Arwes Version">
+    <meta property="og:description" content="Minecraft Web Client with Arwes futuristic UI">
+    <meta property="og:image" content="https://raw.githubusercontent.com/zardoy/minecraft-web-client/refs/heads/next/docs-assets/arwes-banner.webp">
+    <meta property="og:url" content="" id="og-url">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Mcraft Arwes Version">
+    <meta name="twitter:description" content="Minecraft Web Client with Arwes futuristic UI">
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/zardoy/minecraft-web-client/refs/heads/next/docs-assets/arwes-banner.webp">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: black;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <iframe id="mcraftFrame" allowfullscreen allow="microphone *; camera *; display-capture *; autoplay *; clipboard-write *; clipboard-read *; xr-spatial-tracking *;"></iframe>
+
+    <script>
+        const BASE_DOMAIN = 'https://mwc-next-renderer.vercel.app';
+        // const BASE_DOMAIN = 'http://localhost:3001';
+
+        // Build iframe URL with query parameters from current location
+        (function() {
+            // Set og:url to current page URL
+            const ogUrlMeta = document.getElementById('og-url');
+            if (ogUrlMeta) {
+                ogUrlMeta.content = window.location.href;
+            }
+
+            const iframe = document.getElementById('mcraftFrame');
+            // TODO add back futuristic reveal : &setting=rendererFuturisticReveal:true after perf fixed
+            const baseParams = new URLSearchParams('parentFrameMods=1&setting=rendererFuturisticReveal:true&setting=renderDebug:%22advanced%22&setting=menuBackgroundV2Scene:%22cyber%22');
+
+            // Get query parameters from current location
+            const currentParams = new URLSearchParams(window.location.search);
+
+            // Merge current params into base params (current params override base params)
+            for (const [key, value] of currentParams.entries()) {
+                baseParams.set(key, value);
+            }
+
+            // Set iframe src with merged parameters
+            iframe.src = `${BASE_DOMAIN}?${baseParams.toString()}`;
+        })();
+
+        const MODS_REQUEST_MESSAGE = 'mwc:modsRequest';
+        const MODS_RESPONSE_MESSAGE = 'mwc:modsResponse';
+
+        // Listen for mod requests from iframe
+        window.addEventListener('message', async function(event) {
+            // Verify origin for security
+            if (!event.origin.includes(BASE_DOMAIN)) {
+                return;
+            }
+
+            const arwesMod = {
+                name: 'zardoy.arwes-ui',
+                version: '0.1.0',
+                enabled: true,
+                scriptMainUnstable: await fetch('dist/mod.js').then(res => res.text()).then(text => text.replace('//# sourceURL=dist/mod.js', '')),
+                // threeJsBackend: await fetch('dist/three.js').then(res => res.text()).then(text => text.replace('//# sourceURL=dist/three.js', '')),
+                description: 'Arwes UI mod for Mcraft (futuristic UI)',
+                author: 'zardoy',
+            };
+
+            const { data } = event;
+
+            // Check if this is a mod request
+            if (data && typeof data === 'object' && data.type === MODS_REQUEST_MESSAGE) {
+                const iframe = document.getElementById('mcraftFrame');
+
+                // Send mods response back to iframe
+                iframe.contentWindow.postMessage({
+                    type: MODS_RESPONSE_MESSAGE,
+                    mods: [arwesMod]
+                }, '*');
+            }
+        });
+
+        const detectAndResetZoom = () => {
+            const { visualViewport } = window
+            if (!visualViewport) return
+
+            if (visualViewport.scale !== 1) {
+                // Reset zoom by updating viewport meta tag
+                const viewport = document.querySelector('meta[name=viewport]')
+                if (viewport) {
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
+                    // Force re-layout
+                    setTimeout(() => {
+                        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
+                    }, 300)
+                }
+            }
+        }
+
+        detectAndResetZoom()
+        window.addEventListener('pointerdown', detectAndResetZoom)
+    </script>
+</body>
+</html>
