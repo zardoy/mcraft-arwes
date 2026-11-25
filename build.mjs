@@ -25,6 +25,7 @@ const buildOptions = {
         '.jpg': 'dataurl',
         '.webp': 'dataurl',
         '.svg': 'dataurl',
+        '.mp3': 'dataurl',
     },
     plugins: [
         {

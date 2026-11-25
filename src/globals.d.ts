@@ -12,8 +12,8 @@ declare global {
                 useSnapshot: <T>(snapshot: T) => T
             }
         }
-        loadSound: (sound: string) => void
-        playSound: (sound: string) => void
+        loadSound: (path: string, contents?: string) => Promise<unknown>
+        playSound: (sound: string, volume?: number) => void
         miscUiState: {
             hadConnected: boolean
         }
