@@ -187,6 +187,79 @@ addStyles(/* css */ `
   .aw-loading-actions > * {
     flex-shrink: 0;
   }
+  /* the rotating circuit rings of the first arwes loader, with the progress in the middle */
+  .aw-loading-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: min(560px, 100%);
+    max-height: 100%;
+  }
+  .aw-rings {
+    position: relative;
+    flex-shrink: 0;
+    width: min(46vh, 80vw, 420px);
+    aspect-ratio: 1;
+    animation: aw-rings-in 0.7s ease-out both;
+  }
+  .aw-rings svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  /* every rotating part is symmetric around the centre: its own box centre is the centre of the rings */
+  .aw-rings .spin {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: aw-spin var(--spin, 20s) linear infinite;
+  }
+  .aw-rings .spin.reverse {
+    animation-direction: reverse;
+  }
+  .aw-rings-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    pointer-events: none;
+  }
+  .aw-rings-percent {
+    font-size: min(6.5vh, 11vw, 44px);
+    line-height: 1;
+    color: ${palette.header.base};
+  }
+  .aw-rings-caption {
+    font-size: min(1.8vh, 11px);
+    letter-spacing: 0.25em;
+    color: ${rgba(palette.primary.base, 0.65)};
+  }
+  @keyframes aw-spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes aw-rings-in {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  /* short landscape screens (phones): rings beside the information */
+  @media (max-height: 500px) and (min-aspect-ratio: 4/3) {
+    .aw-loading-stack {
+      flex-direction: row;
+      gap: 16px;
+      width: min(820px, 100%);
+    }
+    .aw-rings {
+      width: min(70vh, 40vw);
+    }
+    .aw-rings-percent {
+      font-size: min(10vh, 6vw);
+    }
+  }
   @media (max-width: 500px), (max-height: 420px) {
     .aw-loading-panel {
       gap: 7px;
@@ -245,6 +318,79 @@ const SegmentBar = ({ value }: { value: number }) => {
   </div>
 }
 
+const RING_COLOR = rgba(palette.primary.base, 0.3)
+
+/** the circuit rings of the first loader: dashed rings turning at different speeds, a tick ring, four bars orbiting; progress as an arc on the outside */
+const CircuitRings = ({ value, connected }: { value?: number, connected: boolean }) => {
+  const dashed = [
+    { r: 220, dash: '12 5', spin: 35 },
+    { r: 190, dash: '10 5', spin: 30 },
+    { r: 160, dash: '15 3', spin: 25 },
+    { r: 130, dash: '8 4', spin: 20 },
+    { r: 100, dash: '5 3', spin: 15 },
+    { r: 70, dash: '4 2', spin: 10 },
+  ]
+  const progressR = 252
+  const circumference = 2 * Math.PI * progressR
+  const accent = connected ? rgba(palette.success.base, 0.6) : rgba(palette.primary.base, 0.55)
+  return <div className='aw-rings' aria-hidden>
+    <svg viewBox='-260 -260 520 520'>
+      {/* tick ring */}
+      <g stroke={RING_COLOR} strokeWidth={4}>
+        {Array.from({ length: 72 }, (_, i) => {
+          const a = (i * 5 * Math.PI) / 180
+          return <line key={i} x1={Math.sin(a) * 228} y1={-Math.cos(a) * 228} x2={Math.sin(a) * 240} y2={-Math.cos(a) * 240} />
+        })}
+      </g>
+      {dashed.map(({ r, dash, spin }, i) => (
+        <circle
+          key={r}
+          className={`spin ${i % 2 ? 'reverse' : ''}`}
+          style={{ '--spin': `${spin}s` } as React.CSSProperties}
+          r={r}
+          fill='none'
+          stroke={RING_COLOR}
+          strokeWidth={2}
+          strokeDasharray={dash}
+        />
+      ))}
+      {/* four bars orbiting slowly (green once connected) */}
+      <g className='spin' style={{ '--spin': '40s' } as React.CSSProperties} stroke={accent} strokeWidth={4} strokeLinecap='round'>
+        {[0, 90, 180, 270].map(deg => {
+          const a = (deg * Math.PI) / 180
+          return <line key={deg} x1={Math.sin(a) * 214} y1={-Math.cos(a) * 214} x2={Math.sin(a) * 246} y2={-Math.cos(a) * 246} />
+        })}
+      </g>
+      {/* progress arc, starts at the top */}
+      {value !== undefined && <>
+        <circle r={progressR} fill='none' stroke={rgba(palette.primary.base, 0.12)} strokeWidth={3} />
+        <circle
+          r={progressR}
+          fill='none'
+          stroke={palette.primary.base}
+          strokeWidth={3}
+          strokeDasharray={`${circumference * value} ${circumference}`}
+          transform='rotate(-90)'
+          style={{ transition: 'stroke-dasharray 0.3s ease-out' }}
+        />
+      </>}
+      {/* inner spinner, while there is no percentage to show in the middle */}
+      {value === undefined && <g className='spin reverse' style={{ '--spin': '2s' } as React.CSSProperties} fill='none' strokeWidth={5}>
+        <circle r={36} stroke={rgba(palette.primary.base, 0.12)} />
+        <circle r={36} stroke={palette.primary.base} strokeDasharray={`${Math.PI * 36 * 0.5} ${Math.PI * 72}`} />
+      </g>}
+    </svg>
+    <div className='aw-rings-center'>
+      {value !== undefined
+        ? <>
+          <span className='aw-rings-percent'>{Math.round(value * 100)}%</span>
+          <span className='aw-rings-caption'>LOADING</span>
+        </>
+        : null}
+    </div>
+  </div>
+}
+
 const connectionContext = () => {
   const options = (window as any).lastConnectOptions?.value
   if (!options) return ''
@@ -254,6 +400,7 @@ const connectionContext = () => {
 
 const LoadingScreen = ({ status, isError, lastStatus, backAction, description, actionsSlot, showReconnect, onReconnect, progress, stalledSeconds, children }: Props) => {
   const Button = window.builtinComponents.Button
+  const { hadConnected } = window.mcraft.valtio.useSnapshot(window.miscUiState)
   const elapsed = useElapsed()
   const title = isError ? (status || 'Something went wrong') : (progress?.label || status || 'Loading')
   const log = useStageLog(isError ? '' : title)
@@ -298,7 +445,6 @@ const LoadingScreen = ({ status, isError, lastStatus, backAction, description, a
       <DecipherTitle text={title} />
       <div className='aw-loading-bar-row'>
         {progress ? <SegmentBar value={progress.value} /> : <div className='aw-loading-strip' />}
-        {progress && <span className='aw-loading-percent'>{Math.round(progress.value * 100)}%</span>}
       </div>
       <div className='aw-loading-info'>
         <span>{progress?.step ?? ''}</span>
@@ -321,7 +467,12 @@ const LoadingScreen = ({ status, isError, lastStatus, backAction, description, a
     {ReactDOM.createPortal(
       <div className='aw-loading' style={{ background: isError ? rgba(background.alert, 0.6) : undefined }}>
         <ScreenBackdrop />
-        {panel}
+        {isError
+          ? panel
+          : <div className='aw-loading-stack'>
+            <CircuitRings value={progress?.value} connected={hadConnected} />
+            {panel}
+          </div>}
       </div>,
       document.body
     )}
