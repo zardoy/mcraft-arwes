@@ -183,11 +183,31 @@ addStyles(/* css */ `
     line-height: 1.25;
     word-break: break-word;
   }
+  /* the percentage stays in the exact centre of the rings; the rest stacks above and below it */
   .aw-rings-percent {
-    margin-top: 1cqw;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     font-size: max(22px, 11cqw);
     line-height: 1;
     color: ${palette.header.base};
+  }
+  .aw-rings-above,
+  .aw-rings-below {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.6cqw;
+  }
+  .aw-rings-above {
+    bottom: calc(50% + max(14px, 7cqw));
+  }
+  .aw-rings-below {
+    top: calc(50% + max(14px, 7cqw));
   }
   /* the four stages of the load: done, running, coming */
   .aw-rings-stages {
@@ -456,12 +476,15 @@ const LoadingScreen = ({ status, isError, lastStatus, backAction, description, a
       </div>
     </div>
     : <CircuitRings value={progress?.value} connected={hadConnected}>
-      <div className='aw-rings-top'>
-        <TypingHeader />
-        <span>{elapsed}</span>
+      <div className='aw-rings-above'>
+        <div className='aw-rings-top'>
+          <TypingHeader />
+          <span>{elapsed}</span>
+        </div>
+        <DecipherTitle text={title} className='aw-rings-title' />
       </div>
-      <DecipherTitle text={title} className='aw-rings-title' />
       {progress && <span className='aw-rings-percent'>{Math.round(progress.value * 100)}%</span>}
+      <div className='aw-rings-below'>
       {(progress?.step || progress?.detail) && <span className='aw-rings-step'>{[progress.step, progress.detail].filter(Boolean).join(' · ')}</span>}
       {stalledSeconds !== undefined
         ? <div className='aw-rings-stall'>
@@ -482,6 +505,7 @@ const LoadingScreen = ({ status, isError, lastStatus, backAction, description, a
           : log.length > 1 && <div className='aw-rings-log'>
             {log.slice(0, -1).reverse().map((entry, i) => <div key={`${i}-${entry}`}>✓ {entry}</div>)}
           </div>}
+      </div>
     </CircuitRings>
 
   return <>
