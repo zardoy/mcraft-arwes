@@ -83,23 +83,6 @@ addStyles(/* css */ `
   }
   .aw-loading-error .aw-loading-title {
     user-select: text;
-  };
-  };
-  };
-    animation: aw-flicker 0.9s linear infinite;
-  } 0 6px, transparent 6px 12px);
-    background-size: 40px 6px;
-    border: 1px solid ${rgba(palette.primary.base, 0.35)};
-    animation: aw-strip 0.8s linear infinite;
-  };
-    text-align: right;
-  };
-  };
-  };
-  };
-  };
-    background: ${rgba(palette.secondary.base, 0.12)};
-    border-left: 2px solid ${palette.secondary.base};
   }
   .aw-loading-description {
     font-size: 12px;

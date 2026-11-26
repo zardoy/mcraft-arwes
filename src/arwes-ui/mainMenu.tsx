@@ -180,7 +180,7 @@ export const ArwesMainMenuBase: React.FC<ArwesMainMenuBaseProps> = ({
               )}
               {title && (
                 <Animator duration={{ offset: 0.4 }}>
-                  <Animated as="h1" animated={['flicker', ['y', 15, 0, 0]]}>
+                  <Animated as="h1" animated={['fade', ['y', 15, 0, 0]]}>
                     {title}
                   </Animated>
                 </Animator>

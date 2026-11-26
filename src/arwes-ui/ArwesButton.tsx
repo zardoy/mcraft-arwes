@@ -3,7 +3,7 @@ import { addStyles, background, cornersBackground, palette, rgba } from './theme
 
 // The game button gets the arwes frame through a class on the game's own <button>:
 // no wrapping element (a <button> inside a <button> was invalid, focused twice and shifted the corners off the border), so every layout keeps working.
-// Frame of the v1 Frame component: a dim 1px border, bright corner brackets that light up on hover, a flicker when it appears.
+// Frame of the v1 Frame component: a dim 1px border, bright corner brackets that light up on hover, a short fade when it appears.
 
 addStyles(/* css */ `
   button.arwes-btn {
@@ -12,7 +12,7 @@ addStyles(/* css */ `
     background: ${rgba(background.primary, 0.7)};
     border: 1px solid ${rgba(palette.primary.base, 0.35)};
     transition: color 0.15s ease-out, background-color 0.15s ease-out, border-color 0.15s ease-out;
-    animation: aw-flicker 0.4s linear both;
+    animation: aw-fade-in 0.2s ease-out both;
   }
   /* the halves of the game texture: the left one is hidden, the right one draws the corners */
   button.arwes-btn::after {

@@ -61,25 +61,18 @@ export const cornersBackground = (color: string, length = '6px', width = '2px') 
   `linear-gradient(${color}, ${color}) right bottom / ${width} ${length} no-repeat`,
 ].join(',\n    ')
 
-// shared classes: a framed panel (dim border, bright corners) and the flicker used when things appear
+// shared classes: a framed panel (dim border, bright corners) and the short fade used when things appear
 addStyles(/* css */ `
-  @keyframes aw-flicker {
-    0% { opacity: 0; }
-    20% { opacity: 0.8; }
-    35% { opacity: 0.2; }
-    55% { opacity: 1; }
-    70% { opacity: 0.5; }
-    100% { opacity: 1; }
-  }
-  @keyframes aw-strip {
-    from { background-position: 0 0; }
-    to { background-position: 40px 0; }
+  /* things appear with one short fade, no blinking */
+  @keyframes aw-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
   .aw-panel {
     position: relative;
     background: var(--aw-bg);
     border: 1px solid var(--aw-line);
-    animation: aw-flicker 0.45s linear both;
+    animation: aw-fade-in 0.2s ease-out both;
   }
   .aw-panel::before {
     content: '';
