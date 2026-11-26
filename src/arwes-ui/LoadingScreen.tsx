@@ -32,7 +32,6 @@ interface Props {
   children?: React.ReactNode
 }
 
-const SEGMENTS = 32
 const LOG_SIZE = 4
 
 addStyles(/* css */ `
@@ -84,81 +83,21 @@ addStyles(/* css */ `
   }
   .aw-loading-error .aw-loading-title {
     user-select: text;
-  }
-  .aw-loading-bar-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .aw-loading-bar {
-    display: flex;
-    gap: 2px;
-    flex: 1;
-    height: 14px;
-  }
-  .aw-loading-segment {
-    flex: 1;
-    background: ${rgba(palette.primary.base, 0.12)};
-  }
-  .aw-loading-segment.on {
-    background: ${palette.primary.base};
-  }
-  .aw-loading-segment.current {
-    background: ${rgba(palette.primary.base, 0.55)};
+  };
+  };
+  };
     animation: aw-flicker 0.9s linear infinite;
-  }
-  .aw-loading-strip {
-    flex: 1;
-    height: 6px;
-    background: repeating-linear-gradient(-45deg, ${rgba(palette.primary.base, 0.7)} 0 6px, transparent 6px 12px);
+  } 0 6px, transparent 6px 12px);
     background-size: 40px 6px;
     border: 1px solid ${rgba(palette.primary.base, 0.35)};
     animation: aw-strip 0.8s linear infinite;
-  }
-  .aw-loading-percent {
-    min-width: 3.2em;
-    font-size: 22px;
-    color: ${palette.header.base};
+  };
     text-align: right;
-  }
-  .aw-loading-info {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    min-height: 1.2em;
-    font-size: 11px;
-    color: ${rgba(palette.control.base, 0.7)};
-  }
-  .aw-loading-info span:first-child {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-  .aw-loading-log {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding-top: 8px;
-    font-size: 10px;
-    border-top: 1px solid ${rgba(palette.primary.base, 0.18)};
-  }
-  .aw-loading-log div {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    color: ${rgba(palette.control.base, 0.45)};
-  }
-  .aw-loading-log div.current {
-    color: ${palette.control.base};
-  }
-  .aw-loading-stall {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 6px 8px;
-    font-size: 11px;
-    color: ${palette.secondary.light};
+  };
+  };
+  };
+  };
+  };
     background: ${rgba(palette.secondary.base, 0.12)};
     border-left: 2px solid ${palette.secondary.base};
   }
@@ -187,20 +126,14 @@ addStyles(/* css */ `
   .aw-loading-actions > * {
     flex-shrink: 0;
   }
-  /* the rotating circuit rings of the first arwes loader, with the progress in the middle */
-  .aw-loading-stack {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    width: min(560px, 100%);
-    max-height: 100%;
-  }
+  /* the loader is the rotating circuit rings of the first arwes loader; everything it says is inside them.
+     Sizes inside follow the rings (container units), so it reads the same on a phone and a monitor. */
   .aw-rings {
     position: relative;
     flex-shrink: 0;
-    width: min(46vh, 80vw, 420px);
+    width: min(86vh, 92vw, 600px);
     aspect-ratio: 1;
+    container-type: inline-size;
     animation: aw-rings-in 0.7s ease-out both;
   }
   .aw-rings svg {
@@ -226,18 +159,71 @@ addStyles(/* css */ `
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    pointer-events: none;
+    gap: 1.6cqw;
+    padding: 0 22cqw;
+    text-align: center;
+    /* keeps the text readable over the rings */
+    background: radial-gradient(circle, ${rgba(background.primary, 0.78)} 0 34%, transparent 46%);
+    border-radius: 50%;
+  }
+  .aw-rings-top {
+    display: flex;
+    gap: 2.4cqw;
+    font-size: max(8px, 2.2cqw);
+    letter-spacing: 0.2em;
+    color: ${rgba(palette.primary.base, 0.65)};
+  }
+  .aw-rings-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    max-width: 58cqw;
+    overflow: hidden;
+    font-size: max(11px, 4cqw);
+    line-height: 1.25;
+    word-break: break-word;
   }
   .aw-rings-percent {
-    font-size: min(6.5vh, 11vw, 44px);
+    margin-top: 1cqw;
+    font-size: max(22px, 11cqw);
     line-height: 1;
     color: ${palette.header.base};
   }
   .aw-rings-caption {
-    font-size: min(1.8vh, 11px);
-    letter-spacing: 0.25em;
+    font-size: max(7px, 1.8cqw);
+    letter-spacing: 0.3em;
     color: ${rgba(palette.primary.base, 0.65)};
+  }
+  .aw-rings-step {
+    max-width: 52cqw;
+    overflow: hidden;
+    font-size: max(8px, 2.3cqw);
+    color: ${rgba(palette.control.base, 0.75)};
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .aw-rings-log {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6cqw;
+    max-width: 50cqw;
+    font-size: max(7px, 2cqw);
+  }
+  .aw-rings-log div {
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: ${rgba(palette.control.base, 0.4)};
+  }
+  .aw-rings-stall {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1cqw;
+    font-size: max(8px, 2.2cqw);
+    color: ${palette.secondary.light};
   }
   @keyframes aw-spin {
     to { transform: rotate(360deg); }
@@ -246,18 +232,10 @@ addStyles(/* css */ `
     from { transform: scale(0.8); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
   }
-  /* short landscape screens (phones): rings beside the information */
-  @media (max-height: 500px) and (min-aspect-ratio: 4/3) {
-    .aw-loading-stack {
-      flex-direction: row;
-      gap: 16px;
-      width: min(820px, 100%);
-    }
-    .aw-rings {
-      width: min(70vh, 40vw);
-    }
-    .aw-rings-percent {
-      font-size: min(10vh, 6vw);
+  /* small rings (phones): the stage log would not fit between the rings */
+  @container (max-width: 360px) {
+    .aw-rings-log {
+      display: none;
     }
   }
   @media (max-width: 500px), (max-height: 420px) {
@@ -267,12 +245,6 @@ addStyles(/* css */ `
     }
     .aw-loading-title {
       font-size: 15px;
-    }
-    .aw-loading-percent {
-      font-size: 16px;
-    }
-    .aw-loading-log {
-      display: none;
     }
   }
 `, 'arwes-loading-styles')
@@ -302,26 +274,17 @@ const useStageLog = (label: string) => {
   return log
 }
 
-const DecipherTitle = ({ text }: { text: string }) => {
+const DecipherTitle = ({ text, className = 'aw-loading-title' }: { text: string, className?: string }) => {
   // a new animator per text: every status change deciphers again
   return <Animator key={text} duration={{ enter: Math.min(0.8, 0.2 + text.length * 0.012) }}>
-    <Text as='div' className='aw-loading-title aw-header' manager='decipher' fixed>{text}</Text>
+    <Text as='div' className={`${className} aw-header`} manager='decipher' fixed>{text}</Text>
   </Animator>
-}
-
-const SegmentBar = ({ value }: { value: number }) => {
-  const filled = value * SEGMENTS
-  return <div className='aw-loading-bar' role='progressbar' aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(value * 100)}>
-    {Array.from({ length: SEGMENTS }, (_, i) => (
-      <div key={i} className={`aw-loading-segment ${i < Math.floor(filled) ? 'on' : i === Math.floor(filled) && value < 1 ? 'current' : ''}`} />
-    ))}
-  </div>
 }
 
 const RING_COLOR = rgba(palette.primary.base, 0.3)
 
 /** the circuit rings of the first loader: dashed rings turning at different speeds, a tick ring, four bars orbiting; progress as an arc on the outside */
-const CircuitRings = ({ value, connected }: { value?: number, connected: boolean }) => {
+const CircuitRings = ({ value, connected, children }: { value?: number, connected: boolean, children?: React.ReactNode }) => {
   const dashed = [
     { r: 220, dash: '12 5', spin: 35 },
     { r: 190, dash: '10 5', spin: 30 },
@@ -380,14 +343,7 @@ const CircuitRings = ({ value, connected }: { value?: number, connected: boolean
         <circle r={36} stroke={palette.primary.base} strokeDasharray={`${Math.PI * 36 * 0.5} ${Math.PI * 72}`} />
       </g>}
     </svg>
-    <div className='aw-rings-center'>
-      {value !== undefined
-        ? <>
-          <span className='aw-rings-percent'>{Math.round(value * 100)}%</span>
-          <span className='aw-rings-caption'>LOADING</span>
-        </>
-        : null}
-    </div>
+    <div className='aw-rings-center'>{children}</div>
   </div>
 }
 
@@ -437,42 +393,33 @@ const LoadingScreen = ({ status, isError, lastStatus, backAction, description, a
         {backAction && <Button label='Back' onClick={backAction} />}
       </div>
     </div>
-    : <div className='aw-loading-panel aw-panel' style={layerVars('primary')}>
-      <div className='aw-loading-top'>
+    : <CircuitRings value={progress?.value} connected={hadConnected}>
+      <div className='aw-rings-top'>
         <span>MCRAFT // LINK</span>
         <span>{elapsed}</span>
       </div>
-      <DecipherTitle text={title} />
-      <div className='aw-loading-bar-row'>
-        {progress ? <SegmentBar value={progress.value} /> : <div className='aw-loading-strip' />}
-      </div>
-      <div className='aw-loading-info'>
-        <span>{progress?.step ?? ''}</span>
-        <span>{progress?.detail ?? ''}</span>
-      </div>
-      {stalledSeconds !== undefined && <div className='aw-loading-stall'>
-        <span>No progress for {stalledSeconds} s</span>
-        <Button label='Reload' style={{ width: 70 }} onClick={() => location.reload()} />
-      </div>}
-      {log.length > 1 && <div className='aw-loading-log'>
-        {log.map((entry, i) => {
-          const current = i === log.length - 1
-          return <div key={`${i}-${entry}`} className={current ? 'current' : ''}>{current ? '▸' : '✓'} {entry}</div>
-        })}
-      </div>}
-    </div>
+      <DecipherTitle text={title} className='aw-rings-title' />
+      {progress && <>
+        <span className='aw-rings-percent'>{Math.round(progress.value * 100)}%</span>
+        <span className='aw-rings-caption'>LOADING</span>
+      </>}
+      {(progress?.step || progress?.detail) && <span className='aw-rings-step'>{[progress.step, progress.detail].filter(Boolean).join(' · ')}</span>}
+      {stalledSeconds === undefined
+        ? log.length > 1 && <div className='aw-rings-log'>
+          {log.slice(0, -1).reverse().map((entry, i) => <div key={`${i}-${entry}`}>✓ {entry}</div>)}
+        </div>
+        : <div className='aw-rings-stall'>
+          <span>No progress for {stalledSeconds} s</span>
+          <Button label='Reload' style={{ width: 70 }} onClick={() => location.reload()} />
+        </div>}
+    </CircuitRings>
 
   return <>
     <div style={{ display: 'none' }}>{children}</div>
     {ReactDOM.createPortal(
       <div className='aw-loading' style={{ background: isError ? rgba(background.alert, 0.6) : undefined }}>
         <ScreenBackdrop />
-        {isError
-          ? panel
-          : <div className='aw-loading-stack'>
-            <CircuitRings value={progress?.value} connected={hadConnected} />
-            {panel}
-          </div>}
+        {panel}
       </div>,
       document.body
     )}
