@@ -189,10 +189,32 @@ addStyles(/* css */ `
     line-height: 1;
     color: ${palette.header.base};
   }
-  .aw-rings-caption {
-    font-size: max(7px, 1.8cqw);
-    letter-spacing: 0.3em;
-    color: ${rgba(palette.primary.base, 0.65)};
+  /* the four stages of the load: done, running, coming */
+  .aw-rings-stages {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9cqw;
+    margin-top: 1cqw;
+    font-size: max(8px, 2.2cqw);
+    text-align: left;
+  }
+  .aw-rings-stages div {
+    display: flex;
+    gap: 1.2cqw;
+    white-space: nowrap;
+  }
+  .aw-rings-stages .done {
+    color: ${rgba(palette.control.base, 0.45)};
+  }
+  .aw-rings-stages .current {
+    color: ${palette.control.base};
+  }
+  .aw-rings-stages .next {
+    color: ${rgba(palette.control.base, 0.22)};
+  }
+  .aw-rings-stages .mark {
+    width: 1.2em;
+    text-align: center;
   }
   .aw-rings-step {
     max-width: 52cqw;
@@ -262,6 +284,45 @@ const useElapsed = () => {
     return () => clearInterval(interval)
   }, [])
   return formatElapsed(Date.now() - startedAt)
+}
+
+// The four stages shown in the rings. The client reports finer stages (its loadingProgress.ts labels); each belongs to one of these.
+const STAGE_PLANS = {
+  singleplayer: [
+    { title: 'Start local server', labels: ['Starting local server'] },
+    { title: 'Prepare world generator', labels: ['Downloading world generator', 'Preparing world generator', 'Warming up world generator'] },
+    { title: 'Generate terrain', labels: ['Generating spawn terrain', 'Joining the world'] },
+    { title: 'Render the world', labels: ['Starting renderer', 'Loading chunks'] },
+  ],
+  server: [
+    { title: 'Load game data', labels: ['Loading game data'] },
+    { title: 'Find the server', labels: ['Finding the best proxy', 'Checking the server', 'Preparing textures', 'Signing in'] },
+    { title: 'Join the server', labels: ['Connecting to the server', 'Logging in', 'Receiving server data', 'Joining the world', 'Downloading server resource pack'] },
+    { title: 'Render the world', labels: ['Starting renderer', 'Loading chunks'] },
+  ],
+}
+
+/** the plan and the stage running now (never goes back); undefined when the client reports no stages we know (older clients) */
+const useStagePlan = (label: string | undefined) => {
+  const singleplayer = !!(window as any).lastConnectOptions?.value?.singleplayer
+  const plan = STAGE_PLANS[singleplayer ? 'singleplayer' : 'server']
+  const reached = useRef(-1)
+  const index = label ? plan.findIndex(stage => stage.labels.includes(label)) : -1
+  if (index > reached.current) reached.current = index
+  return reached.current === -1 ? undefined : { plan, current: reached.current }
+}
+
+/** the header types its two lines in turn */
+const HEADER_TEXTS = ['MCRAFT // LINK', 'LOADING']
+const TypingHeader = () => {
+  const [index, setIndex] = useState(0)
+  useEffect(() => {
+    const interval = setInterval(() => setIndex(i => (i + 1) % HEADER_TEXTS.length), 3500)
+    return () => clearInterval(interval)
+  }, [])
+  return <Animator key={index} duration={{ enter: 0.7 }}>
+    <Text manager='sequence' fixed>{HEADER_TEXTS[index]}</Text>
+  </Animator>
 }
 
 /** the last stages shown, newest last */
@@ -360,6 +421,7 @@ const LoadingScreen = ({ status, isError, lastStatus, backAction, description, a
   const elapsed = useElapsed()
   const title = isError ? (status || 'Something went wrong') : (progress?.label || status || 'Loading')
   const log = useStageLog(isError ? '' : title)
+  const stages = useStagePlan(progress?.label)
   const lockConnect = new URLSearchParams(location.search).get('lockConnect') === 'true'
 
   const firstRender = useRef(true)
@@ -395,23 +457,31 @@ const LoadingScreen = ({ status, isError, lastStatus, backAction, description, a
     </div>
     : <CircuitRings value={progress?.value} connected={hadConnected}>
       <div className='aw-rings-top'>
-        <span>MCRAFT // LINK</span>
+        <TypingHeader />
         <span>{elapsed}</span>
       </div>
       <DecipherTitle text={title} className='aw-rings-title' />
-      {progress && <>
-        <span className='aw-rings-percent'>{Math.round(progress.value * 100)}%</span>
-        <span className='aw-rings-caption'>LOADING</span>
-      </>}
+      {progress && <span className='aw-rings-percent'>{Math.round(progress.value * 100)}%</span>}
       {(progress?.step || progress?.detail) && <span className='aw-rings-step'>{[progress.step, progress.detail].filter(Boolean).join(' · ')}</span>}
-      {stalledSeconds === undefined
-        ? log.length > 1 && <div className='aw-rings-log'>
-          {log.slice(0, -1).reverse().map((entry, i) => <div key={`${i}-${entry}`}>✓ {entry}</div>)}
-        </div>
-        : <div className='aw-rings-stall'>
+      {stalledSeconds !== undefined
+        ? <div className='aw-rings-stall'>
           <span>No progress for {stalledSeconds} s</span>
-          <Button label='Reload' style={{ width: 70 }} onClick={() => location.reload()} />
-        </div>}
+          {/* reloads and joins again with the same connection options */}
+          <Button label='Reconnect' style={{ width: 80 }} onClick={() => (onReconnect ? onReconnect() : location.reload())} />
+        </div>
+        : stages
+          ? <div className='aw-rings-stages'>
+            {stages.plan.map((stage, i) => {
+              const state = i < stages.current ? 'done' : i === stages.current ? 'current' : 'next'
+              return <div key={stage.title} className={state}>
+                <span className='mark'>{state === 'done' ? '✓' : state === 'current' ? '▸' : '·'}</span>
+                <span>{stage.title}</span>
+              </div>
+            })}
+          </div>
+          : log.length > 1 && <div className='aw-rings-log'>
+            {log.slice(0, -1).reverse().map((entry, i) => <div key={`${i}-${entry}`}>✓ {entry}</div>)}
+          </div>}
     </CircuitRings>
 
   return <>
